@@ -43,11 +43,11 @@ use crate::serde_types::{
     BucketLocationResult, CompleteMultipartUploadData, HeadObjectResult,
     InitiateMultipartUploadResponse, ListBucketResult, ListMultipartUploadsResult, Part,
 };
+use crate::utils::error_from_response_data;
 use anyhow::anyhow;
 use anyhow::Result;
 use http::header::HeaderName;
 use http::HeaderMap;
-use crate::utils::error_from_response_data;
 
 pub const CHUNK_SIZE: usize = 8_388_608; // 8 Mebibytes, min is 5 (5_242_880);
 
@@ -758,7 +758,7 @@ impl Bucket {
         if first_chunk.len() < CHUNK_SIZE {
             let (data, code) = self.put_object(s3_path, first_chunk.as_slice()).await?;
             if code >= 300 {
-                return Err(error_from_response_data(data, code))
+                return Err(error_from_response_data(data, code));
             }
             return Ok(code);
         }
@@ -767,7 +767,7 @@ impl Bucket {
         let request = RequestImpl::new(self, s3_path, command);
         let (data, code) = request.response_data(false).await?;
         if code >= 300 {
-            return Err(error_from_response_data(data, code))
+            return Err(error_from_response_data(data, code));
         }
 
         let msg: InitiateMultipartUploadResponse =
@@ -828,7 +828,7 @@ impl Bucket {
         let request = RequestImpl::new(self, s3_path, command);
         let (data, code) = request.response_data(false)?;
         if code >= 300 {
-            return Err(error_from_response_data(data, code))
+            return Err(error_from_response_data(data, code));
         }
         let msg: InitiateMultipartUploadResponse =
             serde_xml::from_str(std::str::from_utf8(data.as_slice())?)?;

@@ -184,10 +184,7 @@ pub(crate) fn error_from_response_data(data: Vec<u8>, code: u16) -> anyhow::Erro
             code
         )
     };
-    anyhow::Error::new(std::io::Error::new(
-        std::io::ErrorKind::InvalidData,
-        err,
-    ))
+    anyhow::Error::new(std::io::Error::new(std::io::ErrorKind::InvalidData, err))
 }
 
 #[cfg(test)]
